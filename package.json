@@ -1,0 +1,30 @@
+{
+  "name": "@slatestudio/common-serverless",
+  "version": "0.1.0",
+  "description": "Serverless configuration builder for common-service",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/slate-studio/common-serverless.git"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "eslint lib/ test/ && NODE_PATH=./ nyc --reporter text mocha --exit"
+  },
+  "author": "Alexander Kravets <alex@slatestudio.com>",
+  "license": "ISC",
+  "dependencies": {
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.get": "^4.4.2",
+    "lodash.pick": "^4.4.0"
+  },
+  "devDependencies": {
+    "@slatestudio/common-service": "1.1.7",
+    "chai": "^4.1.2",
+    "eslint": "^5.1.0",
+    "mocha": "^5.2.0",
+    "nyc": "^11.9.0"
+  }
+}
