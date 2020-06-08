@@ -52,29 +52,38 @@ class Serverless {
       config.functions.api.events.push({ http })
     }
 
-
     config.provider.iamRoleStatements = get(config, 'provider.iamRoleStatements', [])
+
+    const tableNames = {}
 
     for (const name in this._components) {
       const { tableName } = this._components[name]
 
-      if (tableName) {
-        config.provider.iamRoleStatements.push({
-          Effect: 'Allow',
-          Action: [
-            'dynamodb:Query',
-            'dynamodb:Scan',
-            'dynamodb:GetItem',
-            'dynamodb:PutItem',
-            'dynamodb:UpdateItem',
-            'dynamodb:DeleteItem'
-          ],
-          Resource: [
-            `arn:aws:dynamodb:\${opt:region, self:provider.region}:*:table/${tableName}`,
-            `arn:aws:dynamodb:\${opt:region, self:provider.region}:*:table/${tableName}/*`
-          ]
-        })
+      if (!tableName) { continue }
+
+      tableNames[tableName] = {
+        Effect: 'Allow',
+        Action: [
+          'dynamodb:Query',
+          'dynamodb:Scan',
+          'dynamodb:GetItem',
+          'dynamodb:PutItem',
+          'dynamodb:UpdateItem',
+          'dynamodb:DeleteItem'
+        ],
+        Resource: [
+          `arn:aws:dynamodb:\${opt:region, self:provider.region}:*:table/${tableName}`,
+          `arn:aws:dynamodb:\${opt:region, self:provider.region}:*:table/${tableName}/*`
+        ]
       }
+    }
+
+    const hasTables = Object.keys(tableNames).length > 0
+
+    if (hasTables) {
+      const iamRoleStatements = Object.values(tableNames)
+      config.provider.iamRoleStatements =
+        config.provider.iamRoleStatements.concat(iamRoleStatements)
     }
 
     return config
