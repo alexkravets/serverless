@@ -1,6 +1,6 @@
 {
   "name": "@kravc/serverless",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Serverless configuration builder for @kravc/service",
   "main": "src/index.js",
   "repository": {
