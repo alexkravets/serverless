@@ -1,5 +1,5 @@
 'use strict'
 
 module.exports = {
-  Serverless: require('./Serverless')
+  build: require('./build')
 }
