@@ -14,7 +14,7 @@ Add `build` script to `package.json`:
 
 ```json
 "scripts": {
-  "build": "NODE_ENV=lambda npm run build",
+  "build": "NODE_ENV=lambda build",
   "dev:deploy": "NODE_APP_INSTANCE=dev npm run build && sls deploy"
 }
 ```
