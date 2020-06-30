@@ -1,40 +1,75 @@
 'use strict'
 
-const get  = require('lodash.get')
-const pick = require('lodash.pick')
+const get = require('lodash.get')
 
-const ROOT_PATH = process.cwd()
-const { name }  = require(`${ROOT_PATH}/package.json`)
-const DEFAULT_SERVICE = name.split('/')[1] ? name.split('/')[1] : name
+const NODE_ENV   = process.env.NODE_ENV || 'serverless'
+const INSTANCE   = process.env.NODE_APP_INSTANCE || 'localhost'
+const ROOT_PATH  = process.cwd()
+const { name }   = require(`${ROOT_PATH}/package.json`)
+const DEFAULT_SERVICE = name.replace('@', '').replace('/', '-')
 
 const build = config => {
-  const result = pick(config, [
-    'service',
-    'provider',
-    'plugins',
-    'custom',
-    'package',
-    'functions',
-    'resources',
-    'authorizer'
-  ])
+  const SERVERLESS = get(config, 'serverless', {})
 
-  result.service = result.service || DEFAULT_SERVICE
-
-  result.functions = result.functions || {}
-  result.functions.api = {
-    handler: 'index.handler',
-    events:  [
-      {
-        http: {
-          method: 'get',
-          path:   '/'
-        }
-      }
-    ]
+  const result = {
+    service: SERVERLESS.service || DEFAULT_SERVICE
   }
 
-  for (const method of [ 'get', 'post', 'patch', 'delete', 'options' ]) {
+  result.provider = {
+    name:    'aws',
+    stage:   INSTANCE,
+    runtime: 'nodejs12.x',
+    environment: {
+      NODE_PATH:         './',
+      NODE_APP_INSTANCE: INSTANCE,
+      NODE_ENV
+    },
+    iamRoleStatements: [{
+      Effect: 'Allow',
+      Action: [
+        'lambda:InvokeFunction',
+        'lambda:InvokeAsync',
+        'lambda:Invoke'
+      ],
+      Resource: '*'
+    }]
+  }
+
+  if (SERVERLESS.region) {
+    result.provider.region = SERVERLESS.region
+  }
+
+  if (SERVERLESS.profile) {
+    result.provider.profile = SERVERLESS.profile
+  }
+
+  result.package = {
+    exclude: ['test/**', 'bin/**']
+  }
+
+  result.functions = {
+    api: {
+      handler: 'index.handler',
+      events:  [
+        {
+          http: {
+            method: 'get',
+            path:   '/'
+          }
+        }
+      ]
+    }
+  }
+
+  const DEFAULT_HTTP_METHODS = [
+    'get',
+    'post',
+    'patch',
+    'delete',
+    'options'
+  ]
+
+  for (const method of DEFAULT_HTTP_METHODS) {
     const path = '/{operationId}'
     const http = {
       path,
@@ -51,11 +86,14 @@ const build = config => {
     result.functions.api.events.push({ http })
   }
 
-  result.provider.iamRoleStatements = get(result, 'provider.iamRoleStatements', [])
+  if (SERVERLESS.iamRoleStatements) {
+    result.provider.iamRoleStatements =
+      result.provider.iamRoleStatements.concat(SERVERLESS.iamRoleStatements)
+  }
 
-  const hasTables = config.tables
+  const TABLES = get(config, 'tables')
 
-  if (!hasTables) {
+  if (!TABLES) {
     return result
   }
 
@@ -68,8 +106,11 @@ const build = config => {
     'dynamodb:DeleteItem'
   ]
 
-  for (const tableConfig of config.tables) {
-    const { name: tableName, actions = DEFAULT_TABLE_ACTIONS } = tableConfig
+  for (const tableKey in TABLES) {
+    const tableConfig     = TABLES[tableKey]
+    const { name, actions = DEFAULT_TABLE_ACTIONS } = tableConfig
+
+    const tableName = `${name}-${INSTANCE}`
 
     const statement = {
       Effect: 'Allow',
