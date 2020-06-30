@@ -108,8 +108,8 @@ const build = config => {
   ]
 
   for (const tableKey in TABLES) {
-    const tableConfig     = TABLES[tableKey]
-    const { name, actions = DEFAULT_TABLE_ACTIONS } = tableConfig
+    const tableConfig = TABLES[tableKey]
+    const { name = DEFAULT_SERVICE, actions = DEFAULT_TABLE_ACTIONS } = tableConfig
 
     const tableName = `${name}-${INSTANCE}`
 
