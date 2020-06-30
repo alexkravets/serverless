@@ -9,6 +9,7 @@ const { name }   = require(`${ROOT_PATH}/package.json`)
 const DEFAULT_SERVICE = name.replace('@', '').replace('/', '-')
 
 const build = config => {
+  const AWS = get(config, 'aws', {})
   const SERVERLESS = get(config, 'serverless', {})
 
   const result = {
@@ -35,12 +36,12 @@ const build = config => {
     }]
   }
 
-  if (SERVERLESS.region) {
-    result.provider.region = SERVERLESS.region
+  if (AWS.region) {
+    result.provider.region = AWS.region
   }
 
-  if (SERVERLESS.profile) {
-    result.provider.profile = SERVERLESS.profile
+  if (AWS.profile) {
+    result.provider.profile = AWS.profile
   }
 
   result.package = {
