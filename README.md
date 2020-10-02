@@ -1,6 +1,6 @@
 # @kravc/serverless
 
-Serverless configuration builder for
+Serverless configuration builder and deployment tool for
 [@kravc/dos](https://github.com/alexkravets/dos) service.
 
 Install:
