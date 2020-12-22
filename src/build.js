@@ -33,7 +33,10 @@ const build = config => {
         'lambda:Invoke'
       ],
       Resource: '*'
-    }]
+    }],
+    apiGateway: {
+      shouldStartNameWithService: true
+    }
   }
 
   if (AWS.region) {
