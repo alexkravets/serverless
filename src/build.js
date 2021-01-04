@@ -36,7 +36,8 @@ const build = config => {
     }],
     apiGateway: {
       shouldStartNameWithService: true
-    }
+    },
+    lambdaHashingVersion: '20201221'
   }
 
   if (AWS.region) {
