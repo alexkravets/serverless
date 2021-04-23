@@ -13,7 +13,8 @@ const build = config => {
   const SERVERLESS = get(config, 'serverless', {})
 
   const result = {
-    service: SERVERLESS.service || DEFAULT_SERVICE
+    service: SERVERLESS.service || DEFAULT_SERVICE,
+    variablesResolutionMode: 20210326
   }
 
   result.provider = {
@@ -23,7 +24,8 @@ const build = config => {
     environment: {
       NODE_PATH:         './',
       NODE_APP_INSTANCE: INSTANCE,
-      NODE_ENV
+      NODE_ENV,
+      ...(SERVERLESS.environment || {})
     },
     iamRoleStatements: [{
       Effect: 'Allow',
@@ -49,7 +51,10 @@ const build = config => {
   }
 
   result.package = {
-    exclude: ['test/**', 'bin/**']
+    patterns: [
+      '!test/**',
+      '!bin/**'
+    ]
   }
 
   result.functions = {
@@ -96,6 +101,10 @@ const build = config => {
       result.provider.iamRoleStatements.concat(SERVERLESS.iamRoleStatements)
   }
 
+  if (SERVERLESS.custom) {
+    result.custom = SERVERLESS.custom
+  }
+
   const TABLES = get(config, 'tables')
 
   if (!TABLES) {
@@ -127,6 +136,11 @@ const build = config => {
     }
 
     result.provider.iamRoleStatements.push(statement)
+  }
+
+  if (result.provider.iamRoleStatements) {
+    result.provider.iam = { role: { statements: result.provider.iamRoleStatements } }
+    delete result.provider.iamRoleStatements
   }
 
   return result
