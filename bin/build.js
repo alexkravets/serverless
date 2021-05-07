@@ -4,8 +4,8 @@
 
 const fs        = require('fs')
 const config    = require('config')
+const { dump }  = require('js-yaml')
 const { build } = require('../src')
-const { safeDump: dump } = require('js-yaml')
 
 const main = () => {
   const input = JSON.parse(JSON.stringify(config))
