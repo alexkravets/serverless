@@ -101,6 +101,10 @@ const build = config => {
       result.provider.iamRoleStatements.concat(SERVERLESS.iamRoleStatements)
   }
 
+  if (SERVERLESS.timeout) {
+    result.provider.timeout = SERVERLESS.timeout
+  }
+
   if (SERVERLESS.custom) {
     result.custom = SERVERLESS.custom
   }
