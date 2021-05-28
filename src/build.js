@@ -113,35 +113,33 @@ const build = config => {
 
   const TABLES = get(config, 'tables')
 
-  if (!TABLES) {
-    return result
-  }
+  if (TABLES) {
+    const DEFAULT_TABLE_ACTIONS = [
+      'dynamodb:Query',
+      'dynamodb:Scan',
+      'dynamodb:GetItem',
+      'dynamodb:PutItem',
+      'dynamodb:UpdateItem',
+      'dynamodb:DeleteItem'
+    ]
 
-  const DEFAULT_TABLE_ACTIONS = [
-    'dynamodb:Query',
-    'dynamodb:Scan',
-    'dynamodb:GetItem',
-    'dynamodb:PutItem',
-    'dynamodb:UpdateItem',
-    'dynamodb:DeleteItem'
-  ]
+    for (const tableKey in TABLES) {
+      const tableConfig = TABLES[tableKey]
+      const { name = DEFAULT_SERVICE, actions = DEFAULT_TABLE_ACTIONS } = tableConfig
 
-  for (const tableKey in TABLES) {
-    const tableConfig = TABLES[tableKey]
-    const { name = DEFAULT_SERVICE, actions = DEFAULT_TABLE_ACTIONS } = tableConfig
+      const tableName = `${name}-${INSTANCE}`
 
-    const tableName = `${name}-${INSTANCE}`
+      const statement = {
+        Effect: 'Allow',
+        Action: actions,
+        Resource: [
+          `arn:aws:dynamodb:\${opt:region, self:provider.region}:*:table/${tableName}`,
+          `arn:aws:dynamodb:\${opt:region, self:provider.region}:*:table/${tableName}/*`
+        ]
+      }
 
-    const statement = {
-      Effect: 'Allow',
-      Action: actions,
-      Resource: [
-        `arn:aws:dynamodb:\${opt:region, self:provider.region}:*:table/${tableName}`,
-        `arn:aws:dynamodb:\${opt:region, self:provider.region}:*:table/${tableName}/*`
-      ]
+      result.provider.iamRoleStatements.push(statement)
     }
-
-    result.provider.iamRoleStatements.push(statement)
   }
 
   if (result.provider.iamRoleStatements) {
