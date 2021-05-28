@@ -2,11 +2,13 @@
 
 const get = require('lodash.get')
 
-const NODE_ENV   = process.env.NODE_ENV || 'serverless'
-const INSTANCE   = process.env.NODE_APP_INSTANCE || 'localhost'
-const ROOT_PATH  = process.cwd()
-const { name }   = require(`${ROOT_PATH}/package.json`)
-const DEFAULT_SERVICE = name.replace('@', '').replace('/', '-')
+const NODE_ENV  = process.env.NODE_ENV || 'serverless'
+const INSTANCE  = process.env.NODE_APP_INSTANCE || 'localhost'
+const ROOT_PATH = process.cwd()
+
+const { name, version } = require(`${ROOT_PATH}/package.json`)
+const [ MAJOR_VERSION ] = version.split('.')
+const DEFAULT_SERVICE   = name.replace('@', '').replace('/', '-') + `-${MAJOR_VERSION}`
 
 const build = config => {
   const AWS = get(config, 'aws', {})
