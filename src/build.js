@@ -9,6 +9,7 @@ const ROOT_PATH = process.cwd()
 const { name, version } = require(`${ROOT_PATH}/package.json`)
 const [ MAJOR_VERSION ] = version.split('.')
 const DEFAULT_SERVICE   = name.replace('@', '').replace('/', '-') + `-v${MAJOR_VERSION}`
+const DEFAULT_TABLE     = name.replace('@', '').replace('/', '-')
 
 const build = config => {
   const AWS = get(config, 'aws', {})
@@ -125,7 +126,7 @@ const build = config => {
 
     for (const tableKey in TABLES) {
       const tableConfig = TABLES[tableKey]
-      const { name = DEFAULT_SERVICE, actions = DEFAULT_TABLE_ACTIONS } = tableConfig
+      const { name = DEFAULT_TABLE, actions = DEFAULT_TABLE_ACTIONS } = tableConfig
 
       const tableName = `${name}-${INSTANCE}`
 
