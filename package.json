@@ -1,6 +1,6 @@
 {
   "name": "@kravc/serverless",
-  "version": "0.7.6",
+  "version": "0.8.0",
   "description": "Serverless configuration builder and deployment tool for @kravc/dos service.",
   "main": "src/index.js",
   "repository": {
@@ -19,15 +19,15 @@
   "author": "Alexander Kravets <a@kra.vc>",
   "license": "ISC",
   "dependencies": {
-    "config": "^3.3.6",
+    "config": "^3.3.8",
     "js-yaml": "^4.1.0",
     "lodash.get": "^4.4.2",
-    "serverless": "^2.40.0"
+    "serverless": "^3.25.1"
   },
   "devDependencies": {
-    "chai": "^4.3.4",
-    "eslint": "^7.25.0",
-    "mocha": "^8.3.2",
+    "chai": "^4.3.7",
+    "eslint": "^8.29.0",
+    "mocha": "^10.2.0",
     "nyc": "^15.1.0"
   }
 }
