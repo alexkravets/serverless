@@ -1,6 +1,6 @@
 {
   "name": "@kravc/serverless",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Serverless configuration builder and deployment tool for @kravc/dos service.",
   "main": "src/index.js",
   "repository": {
@@ -22,7 +22,7 @@
     "config": "^3.3.8",
     "js-yaml": "^4.1.0",
     "lodash.get": "^4.4.2",
-    "serverless": "^3.25.1"
+    "serverless": "^3.27.0"
   },
   "devDependencies": {
     "chai": "^4.3.7",
