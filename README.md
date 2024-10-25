@@ -14,7 +14,7 @@ files, e.g. `config/serverless-dev.yaml`.
 
 ## Scripts
 
-Deploy service to specific environment (e.g. `stg`, default: 'dev'):
+Deploy service to specific environment (e.g. `stg`, default: `dev`):
 
 ```sh
 npx deploy [ENV]
