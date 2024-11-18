@@ -17,7 +17,6 @@ export default [...compat.extends("eslint:recommended"), {
         globals: {
             ...globals.node,
             ...globals.mocha,
-            Promise: true,
         },
 
         ecmaVersion: 2018,

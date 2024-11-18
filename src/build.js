@@ -1,6 +1,6 @@
 'use strict'
 
-const get = require('lodash.get')
+const { get } = require('lodash')
 
 const NODE_ENV  = process.env.NODE_ENV || 'serverless'
 const INSTANCE  = process.env.NODE_APP_INSTANCE || 'localhost'
