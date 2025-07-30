@@ -10,7 +10,7 @@ const { name, version } = require(`${ROOT_PATH}/package.json`)
 const [ MAJOR_VERSION ] = version.split('.')
 const DEFAULT_SERVICE   = name.replace('@', '').replace('/', '-') + `-v${MAJOR_VERSION}`
 const DEFAULT_TABLE     = name.replace('@', '').replace('/', '-')
-const DEFAULT_RUNTIME   = 'nodejs18.x'
+const DEFAULT_RUNTIME   = 'nodejs22.x'
 
 const build = config => {
   const AWS = get(config, 'aws', {})
