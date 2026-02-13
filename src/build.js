@@ -1,25 +1,25 @@
-'use strict'
+'use strict';
 
-const { get } = require('lodash')
+const { get } = require('lodash');
 
-const NODE_ENV  = process.env.NODE_ENV || 'serverless'
-const INSTANCE  = process.env.NODE_APP_INSTANCE || 'localhost'
-const ROOT_PATH = process.cwd()
+const NODE_ENV  = process.env.NODE_ENV || 'serverless';
+const INSTANCE  = process.env.NODE_APP_INSTANCE || 'localhost';
+const ROOT_PATH = process.cwd();
 
-const { name, version } = require(`${ROOT_PATH}/package.json`)
-const [ MAJOR_VERSION ] = version.split('.')
-const DEFAULT_SERVICE   = name.replace('@', '').replace('/', '-') + `-v${MAJOR_VERSION}`
-const DEFAULT_TABLE     = name.replace('@', '').replace('/', '-')
-const DEFAULT_RUNTIME   = 'nodejs22.x'
+const { name, version } = require(`${ROOT_PATH}/package.json`);
+const [ MAJOR_VERSION ] = version.split('.');
+const DEFAULT_SERVICE   = name.replace('@', '').replace('/', '-') + `-v${MAJOR_VERSION}`;
+const DEFAULT_TABLE     = name.replace('@', '').replace('/', '-');
+const DEFAULT_RUNTIME   = 'nodejs22.x';
 
 const build = config => {
-  const AWS = get(config, 'aws', {})
-  const SERVERLESS = get(config, 'serverless', {})
+  const AWS = get(config, 'aws', {});
+  const SERVERLESS = get(config, 'serverless', {});
 
   const result = {
     service: SERVERLESS.service || DEFAULT_SERVICE,
     variablesResolutionMode: 20210326
-  }
+  };
 
   result.provider = {
     name:    'aws',
@@ -44,14 +44,14 @@ const build = config => {
       shouldStartNameWithService: true
     },
     lambdaHashingVersion: '20201221'
-  }
+  };
 
   if (AWS.region) {
-    result.provider.region = AWS.region
+    result.provider.region = AWS.region;
   }
 
   if (AWS.profile) {
-    result.provider.profile = AWS.profile
+    result.provider.profile = AWS.profile;
   }
 
   result.package = {
@@ -59,7 +59,7 @@ const build = config => {
       '!test/**',
       '!bin/**'
     ]
-  }
+  };
 
   result.functions = {
     api: {
@@ -73,7 +73,7 @@ const build = config => {
         }
       ]
     }
-  }
+  };
 
   const DEFAULT_HTTP_METHODS = [
     'get',
@@ -81,10 +81,10 @@ const build = config => {
     'patch',
     'delete',
     'options'
-  ]
+  ];
 
   for (const method of DEFAULT_HTTP_METHODS) {
-    const path = '/{operationId}'
+    const path = '/{operationId}';
     const http = {
       path,
       method,
@@ -95,25 +95,25 @@ const build = config => {
           }
         }
       }
-    }
+    };
 
-    result.functions.api.events.push({ http })
+    result.functions.api.events.push({ http });
   }
 
   if (SERVERLESS.iamRoleStatements) {
     result.provider.iamRoleStatements =
-      result.provider.iamRoleStatements.concat(SERVERLESS.iamRoleStatements)
+      result.provider.iamRoleStatements.concat(SERVERLESS.iamRoleStatements);
   }
 
   if (SERVERLESS.timeout) {
-    result.provider.timeout = SERVERLESS.timeout
+    result.provider.timeout = SERVERLESS.timeout;
   }
 
   if (SERVERLESS.custom) {
-    result.custom = SERVERLESS.custom
+    result.custom = SERVERLESS.custom;
   }
 
-  const TABLES = get(config, 'tables')
+  const TABLES = get(config, 'tables');
 
   if (TABLES) {
     const DEFAULT_TABLE_ACTIONS = [
@@ -123,13 +123,13 @@ const build = config => {
       'dynamodb:PutItem',
       'dynamodb:UpdateItem',
       'dynamodb:DeleteItem'
-    ]
+    ];
 
     for (const tableKey in TABLES) {
-      const tableConfig = TABLES[tableKey]
-      const { name = DEFAULT_TABLE, actions = DEFAULT_TABLE_ACTIONS } = tableConfig
+      const tableConfig = TABLES[tableKey];
+      const { name = DEFAULT_TABLE, actions = DEFAULT_TABLE_ACTIONS } = tableConfig;
 
-      const tableName = `${name}-${INSTANCE}`
+      const tableName = `${name}-${INSTANCE}`;
 
       const statement = {
         Effect: 'Allow',
@@ -138,18 +138,18 @@ const build = config => {
           `arn:aws:dynamodb:\${opt:region, self:provider.region}:*:table/${tableName}`,
           `arn:aws:dynamodb:\${opt:region, self:provider.region}:*:table/${tableName}/*`
         ]
-      }
+      };
 
-      result.provider.iamRoleStatements.push(statement)
+      result.provider.iamRoleStatements.push(statement);
     }
   }
 
   if (result.provider.iamRoleStatements) {
-    result.provider.iam = { role: { statements: result.provider.iamRoleStatements } }
-    delete result.provider.iamRoleStatements
+    result.provider.iam = { role: { statements: result.provider.iamRoleStatements } };
+    delete result.provider.iamRoleStatements;
   }
 
-  return result
-}
+  return result;
+};
 
-module.exports = build
+module.exports = build;
