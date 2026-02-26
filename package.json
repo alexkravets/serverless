@@ -1,6 +1,6 @@
 {
   "name": "@kravc/serverless",
-  "version": "0.11.0",
+  "version": "1.0.0",
   "description": "Serverless configuration builder and deployment tool for @kravc/dos service.",
   "main": "src/index.js",
   "repository": {
@@ -16,7 +16,7 @@
     "info": "bin/info.sh",
     "logs": "bin/logs.sh"
   },
-  "author": "Alexander Kravets <a@kra.vc>",
+  "author": "Oleksandr Kravets <a@kra.vc>",
   "license": "ISC",
   "dependencies": {
     "config": "^4.3.0",

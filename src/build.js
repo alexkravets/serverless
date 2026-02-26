@@ -10,7 +10,7 @@ const { name, version } = require(`${ROOT_PATH}/package.json`);
 const [ MAJOR_VERSION ] = version.split('.');
 const DEFAULT_SERVICE   = name.replace('@', '').replace('/', '-') + `-v${MAJOR_VERSION}`;
 const DEFAULT_TABLE     = name.replace('@', '').replace('/', '-');
-const DEFAULT_RUNTIME   = 'nodejs22.x';
+const DEFAULT_RUNTIME   = 'nodejs24.x';
 
 const build = config => {
   const AWS = get(config, 'aws', {});
@@ -113,7 +113,12 @@ const build = config => {
     result.custom = SERVERLESS.custom;
   }
 
-  const TABLES = get(config, 'tables');
+  let TABLES = get(config, 'tables');
+  const TABLE = get(config, 'dynamodb');
+
+  if (TABLE) {
+    TABLES = { default: TABLE };
+  }
 
   if (TABLES) {
     const DEFAULT_TABLE_ACTIONS = [
