@@ -50,7 +50,9 @@ const build = config => {
     result.provider.region = AWS.region;
   }
 
-  if (AWS.profile) {
+  const hasProfile = AWS.profile && !process.env.GITHUB_ACTIONS;
+
+  if (hasProfile) {
     result.provider.profile = AWS.profile;
   }
 
