@@ -8,8 +8,6 @@ const uploadZip = async (
   Bucket: string,
   zipPath: string
 ): Promise<string> => {
-  console.log('Packaging...');
-
   const Key = `${Date.now()}.zip`;
   const Body = fs.createReadStream(zipPath);
   const ContentType = 'application/zip';

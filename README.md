@@ -14,6 +14,7 @@ npm i --save-dev @kravc/serverless
 
 ```sh
 npx sls deploy [ENV]    # deploy to environment (default: dev)
+npx sls delete [ENV]    # empty deployment bucket and delete stack
 npx sls info   [ENV]    # show stack status and endpoint URL
 npx sls logs   [ENV]    # tail Lambda logs
 npx sls build  [ENV]    # generate template.yaml and .deployment locally

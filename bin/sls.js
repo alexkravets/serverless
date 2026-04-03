@@ -6,7 +6,7 @@ const [command, env = 'dev'] = process.argv.slice(2);
 
 if (!command) {
   console.error('Usage: sls <command> [env]');
-  console.error('Commands: build, deploy, info, logs');
+  console.error('Commands: build, deploy, delete, info, logs');
   process.exit(1);
 }
 
@@ -35,7 +35,14 @@ switch (command) {
   }
 
   case 'deploy':
-    require('../dist/deploy').main(env).catch(err => {
+    require('../dist/deploy').default(env).catch(err => {
+      console.error(err.message || err);
+      process.exit(1);
+    });
+    break;
+
+  case 'delete':
+    require('../dist/delete').default(env).catch(err => {
       console.error(err.message || err);
       process.exit(1);
     });
@@ -57,6 +64,6 @@ switch (command) {
 
   default:
     console.error(`Unknown command: ${command}`);
-    console.error('Commands: build, deploy, info, logs');
+    console.error('Commands: build, deploy, delete, info, logs');
     process.exit(1);
 }

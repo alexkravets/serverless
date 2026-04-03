@@ -50,6 +50,7 @@ const logs = async (env?: Env) => {
 
   // NOTE: start from last 1 minute:
   let startTime = Date.now() - 60_000;
+  let lastEventTime: number | undefined;
 
   while (true) {
     const command = new FilterLogEventsCommand({
@@ -67,14 +68,27 @@ const logs = async (env?: Env) => {
       const msg = (event.message ?? '').trimEnd();
 
       console.log(`${ts}  ${msg}`);
+
+      // NOTE: track the latest event timestamp so startTime can advance
+      //       precisely on the next poll, preventing missed events between polls:
+      const hasTimestamp = event.timestamp && (!lastEventTime || event.timestamp > lastEventTime);
+
+      if (hasTimestamp) {
+        lastEventTime = event.timestamp;
+      }
     }
 
     if (result.nextToken) {
+      // NOTE: keep paginating within the same time window:
       nextToken = result.nextToken;
-
     } else {
       nextToken = undefined;
-      startTime = Date.now() - 1000;
+
+      // NOTE: advance startTime to just after the last seen event; fall back
+      //       to Date.now() - 1s when no events have been received yet:
+      startTime = lastEventTime
+        ? lastEventTime + 1
+        : Date.now() - 1000;
 
       await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
     }

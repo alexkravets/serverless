@@ -2,17 +2,30 @@
 
 import logs from './logs';
 import { CloudWatchLogsClient } from '@aws-sdk/client-cloudwatch-logs';
+import getConfig from './getConfig';
+import getDeploymentMeta from './getDeploymentMeta';
+import type { Config } from './getConfig';
+import type { DeploymentMeta } from './getDeploymentMeta';
 
 jest.mock('@aws-sdk/client-cloudwatch-logs');
+jest.mock('./getConfig');
+jest.mock('./getDeploymentMeta');
 
 let mockSend: jest.Mock;
 
 beforeEach(() => {
-  delete process.env.GITHUB_ACTIONS;
   delete process.env.AWS_PROFILE;
 
   mockSend = jest.fn();
   jest.mocked(CloudWatchLogsClient).mockImplementation(() => ({ send: mockSend }) as unknown as CloudWatchLogsClient);
+
+  jest.mocked(getConfig).mockReturnValue({} as unknown as Config);
+
+  jest.mocked(getDeploymentMeta).mockReturnValue({
+    region: 'us-east-1',
+    profile: undefined,
+    stackName: 'my-stack',
+  } as DeploymentMeta);
 });
 
 afterEach(() => {
@@ -83,7 +96,7 @@ describe('logs()', () => {
     jest.restoreAllMocks();
   });
 
-  it('sleeps and continues polling when nextToken is missing', async () => {
+  it('sleeps and advances startTime by lastEventTime when events were received', async () => {
     // Instead of fake timers (which can be sensitive to scheduling order),
     // make setTimeout resolve immediately so the polling loop continues.
     const setTimeoutSpy = jest.spyOn(global, 'setTimeout').mockImplementation((cb) => {
@@ -109,6 +122,27 @@ describe('logs()', () => {
     }
   });
 
+  it('sleeps and falls back to Date.now() - 1s when no events have been received', async () => {
+    const setTimeoutSpy = jest.spyOn(global, 'setTimeout').mockImplementation((cb) => {
+      (cb as () => void)();
+      return 0 as unknown as ReturnType<typeof setTimeout>;
+    });
+
+    try {
+      mockSend
+        .mockResolvedValueOnce({ events: [] })
+        .mockRejectedValueOnce(new Error('stop'));
+
+      jest.spyOn(console, 'log').mockImplementation();
+
+      await expect(logs('dev')).rejects.toThrow('stop');
+
+      expect(mockSend).toHaveBeenCalledTimes(2);
+    } finally {
+      setTimeoutSpy.mockRestore();
+    }
+  });
+
   it('re-throws non-Error values', async () => {
     mockSend.mockRejectedValueOnce('stop');
 
@@ -119,11 +153,7 @@ describe('logs()', () => {
     jest.restoreAllMocks();
   });
 
-  it('handles missing events/timestamp/message and skips AWS_PROFILE when profile is absent', async () => {
-    // `config` is cached by `require('config')`, so env switching may not fully remove `aws.profile`.
-    // Setting `GITHUB_ACTIONS` forces `isProfileRequired` to be false and makes `profile` undefined.
-    process.env.GITHUB_ACTIONS = '1';
-
+  it('handles empty events array and missing event fields', async () => {
     mockSend
       .mockResolvedValueOnce({ nextToken: 'tok-1' })
       .mockResolvedValueOnce({
@@ -136,10 +166,38 @@ describe('logs()', () => {
 
     await expect(logs('dev')).rejects.toThrow('stop');
 
-    expect(process.env.AWS_PROFILE).toBeUndefined();
-
     const output = consoleSpy.mock.calls.flat().join('\n');
     expect(output).toContain('1970-01-01T00:00:00.000Z');
     consoleSpy.mockRestore();
+  });
+
+  it('sets AWS_PROFILE when profile is present', async () => {
+    jest.mocked(getDeploymentMeta).mockReturnValueOnce({
+      region: 'us-east-1',
+      profile: 'profile-123',
+      stackName: 'my-stack',
+    } as DeploymentMeta);
+
+    mockSend
+      .mockResolvedValueOnce({ events: [], nextToken: 'tok' })
+      .mockRejectedValueOnce(new Error('stop'));
+
+    jest.spyOn(console, 'log').mockImplementation();
+
+    await expect(logs('dev')).rejects.toThrow('stop');
+
+    expect(process.env.AWS_PROFILE).toBe('profile-123');
+  });
+
+  it('does not set AWS_PROFILE when profile is undefined', async () => {
+    mockSend
+      .mockResolvedValueOnce({ events: [], nextToken: 'tok' })
+      .mockRejectedValueOnce(new Error('stop'));
+
+    jest.spyOn(console, 'log').mockImplementation();
+
+    await expect(logs('dev')).rejects.toThrow('stop');
+
+    expect(process.env.AWS_PROFILE).toBeUndefined();
   });
 });

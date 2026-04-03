@@ -23,6 +23,7 @@ This is `@kravc/serverless` v2, a dev-dependency CLI tool for [@kravc/dos](https
 - `src/build.ts` — `build(config)` returns a CloudFormation template object
 - `src/index.ts` — public re-exports from all modules
 - `src/deploy.ts` — CLI logic: zip project, upload to S3, create/execute CloudFormation change set
+- `src/deleteStack.ts` — CLI logic: empty and delete the S3 deployment bucket, then delete the CloudFormation stack
 - `src/info.ts` — CLI logic: describe CloudFormation stack outputs
 - `src/logs.ts` — CLI logic: poll CloudWatch Logs and stream to stdout
 
@@ -34,6 +35,7 @@ Single entry point `bin/sls.js` — accepts `sls <command> [env]`:
 
 - `sls build [env]` — generates `template.yaml` + `.deployment` (for inspection)
 - `sls deploy [env]` → `dist/deploy.main(env)`
+- `sls delete [env]` → `dist/deleteStack.default(env)` — empties deployment bucket then deletes the stack
 - `sls info [env]` → `dist/info.main(env)`
 - `sls logs [env]` → `dist/logs.main(env)`
 
