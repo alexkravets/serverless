@@ -1,0 +1,4 @@
+url: 'https://dev.host.com/api/service'
+aws:
+  region: 'us-east-1'
+  profile: 'default'

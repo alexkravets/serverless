@@ -1,9 +1,11 @@
 import eslint from '@eslint/js';
 import globals from 'globals';
-import { globalIgnores, defineConfig } from 'eslint/config';
+import tseslint from 'typescript-eslint';
+import { globalIgnores } from 'eslint/config';
 
-export default defineConfig(
+export default tseslint.config(
   globalIgnores([ '**/dist/', '**/coverage/' ]),
+  eslint.configs.recommended,
   {
     languageOptions: {
       globals: {
@@ -15,5 +17,16 @@ export default defineConfig(
       quotes: ['error', 'single'],
     },
   },
-  eslint.configs.recommended,
+  {
+    files: ['**/*.ts'],
+    extends: tseslint.configs.recommended,
+  },
+  {
+    files: ['**/*.test.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+      },
+    },
+  },
 );
