@@ -8,6 +8,7 @@ import archiver from 'archiver';
 
 // NOTE: only include production-relevant paths in the zip:
 const INCLUDE = [
+  '.composer/**',
   'build/**',
   'config/**',
   'index.js',
