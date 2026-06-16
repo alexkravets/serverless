@@ -26,7 +26,8 @@ const deploy = async (env?: Env) => {
   const clientConfig = { region };
   const s3 = new S3Client(clientConfig);
   const cfn = new CloudFormationClient(clientConfig);
-  const bucket = `${stackName}-deployments`;
+  const bucketRegion = region ?? 'us-east-1';
+  const bucket = `${stackName}-${bucketRegion}-deployments`;
 
   await ensureBucket(s3, bucket, region);
 

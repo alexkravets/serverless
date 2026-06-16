@@ -58,7 +58,7 @@ describe('deleteStack()', () => {
     expect(mockWaitUntilStackDeleteComplete).toHaveBeenCalledTimes(1);
 
     const output = consoleSpy.mock.calls.flat().join('\n');
-    expect(output).toContain('my-stack-deployments');
+    expect(output).toContain('my-stack-us-east-1-deployments');
     expect(output).toContain('my-stack');
     consoleSpy.mockRestore();
   });

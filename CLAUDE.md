@@ -24,6 +24,8 @@ This is `@kravc/serverless` v2, a dev-dependency CLI tool for [@kravc/dos](https
 - `src/index.ts` — public re-exports from all modules
 - `src/deploy.ts` — CLI logic: zip project, upload to S3, create/execute CloudFormation change set
 - `src/deleteStack.ts` — CLI logic: empty and delete the S3 deployment bucket, then delete the CloudFormation stack
+
+Deployment bucket name: `{stackName}-{region}-deployments` (region falls back to `us-east-1` when `aws.region` is unset). Including the region keeps names distinct across regions and avoids S3's global-namespace release lag when the same stack is redeployed to a different region.
 - `src/info.ts` — CLI logic: describe CloudFormation stack outputs
 - `src/logs.ts` — CLI logic: poll CloudWatch Logs and stream to stdout
 
