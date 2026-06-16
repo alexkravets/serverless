@@ -42,7 +42,7 @@ switch (command) {
     break;
 
   case 'delete':
-    require('../dist/delete').default(env).catch(err => {
+    require('../dist/deleteStack').default(env).catch(err => {
       console.error(err.message || err);
       process.exit(1);
     });
